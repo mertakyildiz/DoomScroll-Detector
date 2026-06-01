@@ -6,9 +6,15 @@ files = glob.glob("*.json")
 all_sessions = []
 
 SENSORS = {
-    "Accelerometer": ["x", "y", "z"],
-    "Gyroscope":     ["x", "y", "z"],
-    "Orientation":   ["roll", "pitch", "yaw"],
+    "TotalAcceleration": ["x", "y", "z"],
+    "Gyroscope":         ["x", "y", "z"],
+    "Orientation":       ["roll", "pitch", "yaw"],
+}
+
+SENSOR_PREFIX = {
+    "TotalAcceleration": "accelerometer",
+    "Gyroscope":         "gyroscope",
+    "Orientation":       "orientation",
 }
 
 for filepath in files:
@@ -27,7 +33,7 @@ for filepath in files:
         df = pd.DataFrame(rows)
         df["time_ns"] = df["time"].astype(float)
         df = df.set_index("time_ns")[cols].astype(float)
-        df.columns = [f"{sensor.lower()}_{c}" for c in cols]
+        df.columns = [f"{SENSOR_PREFIX[sensor]}_{c}" for c in cols]
         sensor_dfs[sensor] = df
 
     # Common 100Hz grid (10ms = 10_000_000 ns) spanning the session
