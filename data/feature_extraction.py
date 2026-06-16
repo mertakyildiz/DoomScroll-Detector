@@ -105,9 +105,15 @@ for session_id, session_df in df.groupby("session_id"):
 
 features_df = pd.DataFrame(all_window_features)
 
-# Convenience label columns for the two-step classifier
-features_df["is_walking"]   = features_df["label"].str.contains("Walking",  case=False).astype(int)
-features_df["is_scrolling"] = features_df["label"].str.contains("Scroll",   case=False).astype(int)
+# Convenience label columns for the two-step classifier.
+# When the label is "unknown" (no Tags sensor in the JSON), fall back to the
+# session path, which always encodes the activity (e.g. "Walking_scrolling").
+# The regex handles the "scolling" typo present in some filenames.
+label_or_path = features_df["label"].where(
+    features_df["label"] != "unknown", features_df["session_id"]
+)
+features_df["is_walking"]   = label_or_path.str.contains("Walking",       case=False).astype(int)
+features_df["is_scrolling"] = label_or_path.str.contains("scroll|scoll",  case=False, regex=True).astype(int)
 
 features_df.to_csv("har_features.csv", index=False)
 

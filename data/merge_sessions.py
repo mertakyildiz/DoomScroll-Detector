@@ -2,7 +2,7 @@ import json
 import glob
 import pandas as pd
 
-files = glob.glob("*.json")
+files = glob.glob("records/*.json")
 all_sessions = []
 
 SENSORS = {
@@ -42,10 +42,17 @@ for filepath in files:
     grid = pd.DataFrame(index=pd.RangeIndex(int(t_start), int(t_end), 10_000_000))
     grid.index.name = "time_ns"
 
-    # Align each sensor to the grid via interpolation
+    # Align each sensor to the grid via interpolation.
+    # grid.join() only matches exact timestamps; instead we merge the sensor
+    # timestamps into the grid index, interpolate between readings, then
+    # project back to the 10ms grid points.
     aligned = []
     for df in sensor_dfs.values():
-        resampled = grid.join(df, how="left").interpolate(method="index").bfill()
+        combined_idx = df.index.union(grid.index)
+        resampled = (df.reindex(combined_idx)
+                       .interpolate(method="index")
+                       .bfill()
+                       .reindex(grid.index))
         aligned.append(resampled)
 
     combined = pd.concat(aligned, axis=1)
