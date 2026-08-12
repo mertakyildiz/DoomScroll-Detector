@@ -50,12 +50,15 @@ For comparison, the closest prior published result (Zhuo et al., 2020) reported 
 ## Repository structure
 
 ```
-data/
+preprocessing/
   merge_sessions.py       # raw JSON → common 100Hz grid → interpolation → merged session CSV
   feature_extraction.py   # 4-second windowing → 116 hand-engineered features per window
+  sample_data/            # a few representative raw SensorLogger session files (see note below)
 classifier.ipynb          # Random Forest: 4-class joint, multi-output, and cascade experiments
 joint_svm.ipynb           # SVM+RBF: 4-class joint and multi-output experiments
 ```
+
+**On the data:** the full dataset is 58 sessions collected by the team and isn't included here in full (raw sessions run several MB to 25+ MB each — several hundred MB combined, more than makes sense to version in a code repo). `preprocessing/sample_data/` has three representative raw sessions (a short test capture, one typing session, one watching session) so you can see the actual SensorLogger JSON format and run the pipeline scripts end-to-end. Ping me if you'd like access to the full 58-session set.
 
 ## Limitations
 

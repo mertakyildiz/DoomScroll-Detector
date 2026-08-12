@@ -1,6 +1,7 @@
-## Ignore the dataset files
+## Ignore the dataset files except our small samples
 *.csv
 *.json
+!preprocessing/sample_data/*.json
 
 ## Env
 .venv/
